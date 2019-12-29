@@ -1,4 +1,4 @@
-import styled from'styled-components'
+import styled from 'styled-components'
 import global from '../../assets/style/global-style'
 
 export const Top = styled.div`
