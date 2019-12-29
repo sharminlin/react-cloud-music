@@ -10,7 +10,7 @@ const ScrollContainer = styled.div`
 `
 
 const Scroll = forwardRef((props, ref) => {
-  const { direction, click, refresh, pullUpLoading, pullDownLoading, bounceTop, bounceBottom } = props
+  const { direction, click, refresh, bounceTop, bounceBottom } = props
   const { pullUp, pullDown, onScroll } = props
 
   //better-scroll 实例对象
