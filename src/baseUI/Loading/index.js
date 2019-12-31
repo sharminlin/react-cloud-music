@@ -31,9 +31,9 @@ const LoadingWrapper = styled.div`
   }
 `
 
-function Loading () {
+function Loading ({ show }) {
   return (
-    <LoadingWrapper>
+    <LoadingWrapper style={{display: show ? '' : 'none'}}>
       <div></div>
       <div></div>
     </LoadingWrapper>
