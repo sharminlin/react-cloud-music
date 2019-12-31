@@ -15,7 +15,7 @@ const Scroll = forwardRef((props, ref) => {
 
   //better-scroll 实例对象
   const [bScroll, setBScroll] = useState()
-  //current 指向初始化 bs 实例需要的 DOM 元素 
+  //current 指向初始化 bs 实例需要的 DOM 元素
   const scrollContaninerRef = useRef()
 
   // 初始化bScroll实例
@@ -34,6 +34,7 @@ const Scroll = forwardRef((props, ref) => {
     return () => {
       setBScroll(null);
     }
+    // eslint-disable-next-line
   }, []);
 
   // 绑定on scroll事件

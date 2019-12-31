@@ -17,9 +17,10 @@ function Recommend (props) {
     if (!bannerList.size) {
       getBannerDataDispatch()
     }
-    if (!recommendList) {
+    if (!recommendList.size) {
       getRecommendListDataDispatch()
     }
+    // eslint-disable-next-line
   }, [])
 
   const bannerListJS = bannerList ? bannerList.toJS() : []
