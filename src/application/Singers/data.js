@@ -1,8 +1,8 @@
 import React, { createContext, useReducer } from 'react'
 import { fromJS } from 'immutable'
 
-export const CHANGE_CATEGORY = 'CHANGE_CATEGORY'
-export const CHANGE_ALPHA = 'CHANGE_ALPHA'
+export const CHANGE_CATEGORY = 'singers/CHANGE_CATEGORY'
+export const CHANGE_ALPHA = 'singers/CHANGE_ALPHA'
 
 export const CategoryDataContext = createContext({})
 

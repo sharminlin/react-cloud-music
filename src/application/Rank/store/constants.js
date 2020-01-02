@@ -1,0 +1,3 @@
+export const CHANGE_RANKLIST = 'CHANGE_RANKLIST'
+
+export const CHANGE_LOADING = 'CHANGE_LOADING'
