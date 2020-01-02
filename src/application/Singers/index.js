@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { connect } from 'react-redux'
 import LazyLoad, { forceCheck } from 'react-lazyload'
 import Horizen from '../../baseUI/HorizenItem'
@@ -16,10 +16,13 @@ import {
   changePullDownLoading,
   refreshMoreHotSingerList
 } from './store/action';
+import { CHANGE_CATEGORY, CHANGE_ALPHA, CategoryDataContext } from './data'
 
 function Singer (props) {
-  let [ category, setCategory ] = useState('')
-  let [ alpha, setAlpha ] = useState('')
+  // let [ category, setCategory ] = useState('')
+  // let [ alpha, setAlpha ] = useState('')
+  const { data, dispatch } = useContext(CategoryDataContext)
+  const { category, alpha } = data.toJS()
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props
   const { getHotSingerDispatch, updateDispatch, pullUpRefreshDispatch, pullDownRefreshDispatch } = props
@@ -32,12 +35,14 @@ function Singer (props) {
   }, [])
 
   function handleChangeCategory (value) {
-    setCategory(value)
+    // setCategory(value)
+    dispatch({ type: CHANGE_CATEGORY, data: value })
     updateDispatch(value, alpha)
   }
 
   function handleChangeAlpha (value) {
-    setAlpha(value)
+    // setAlpha(value)
+    dispatch({ type: CHANGE_ALPHA, data: value })
     updateDispatch(category, value)
   }
 
