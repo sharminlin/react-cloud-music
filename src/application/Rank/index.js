@@ -22,7 +22,7 @@ function Rank (props) {
     }
     // eslint-disable-next-line
   }, [])
-  console.log(rankList)
+
   let rankListJS = rankList.toJS()
   let globalStartIndex = filterIndex(rankListJS)
   let officialList = rankListJS.slice(0, globalStartIndex)
