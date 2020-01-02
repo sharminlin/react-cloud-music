@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { renderRoutes } from 'react-router-config';
 import { forceCheck } from 'react-lazyload'
 import Slider from '../../components/Slider'
 import RecommendList from '../../components/List'
@@ -35,6 +36,7 @@ function Recommend (props) {
         </div>
       </Scroll>
       { enterLoading ? <Loading></Loading> : null }
+      { renderRoutes(props.route.children) }
     </Content>
   )
 }
