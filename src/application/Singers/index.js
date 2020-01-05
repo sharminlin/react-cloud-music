@@ -1,5 +1,6 @@
 import React, { useEffect, useContext } from 'react'
 import { connect } from 'react-redux'
+import { renderRoutes } from 'react-router-config'
 import LazyLoad, { forceCheck } from 'react-lazyload'
 import Horizen from '../../baseUI/HorizenItem'
 import Scroll from '../../baseUI/Scroll'
@@ -54,6 +55,10 @@ function Singer (props) {
     pullDownRefreshDispatch(category, alpha)
   }
 
+  function enterDetail (id) {
+    props.history.push (`/singers/${id}`);
+  };
+
   // 渲染函数，返回歌手列表
   const renderSingerList = () => {
     const singerListJS = singerList ? singerList.toJS() : []
@@ -62,7 +67,7 @@ function Singer (props) {
         {
           singerListJS.map((item, index) => {
             return (
-              <ListItem key={item.accountId + '-' + index }>
+              <ListItem key={item.accountId + '-' + index } onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
                   <LazyLoad placeholder={<img src={require('./singer.png')} width="100%" height="100%" alt="music" />}>
                     <img src={`${item.picUrl}?param=300x300`} width="100%" height="100%" alt="music" />
@@ -95,6 +100,7 @@ function Singer (props) {
         </Scroll>
       </ListContainer>
       <Loading show={enterLoading}></Loading>
+      { renderRoutes(props.route.routes) }
     </React.Fragment>
   )
 }

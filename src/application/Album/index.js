@@ -1,37 +1,32 @@
-import React, { useState, useRef, useCallback} from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
 import { Container, TopDesc, Menu, SongList, SongItem } from './style';
 import Header from './../../baseUI/Header/index';
 import Scroll from '../../baseUI/Scroll/index';
-import { getCount, getName } from '../../api/util'
+import Loading from '../../baseUI/Loading/index';
+import { getCount, getName, isEmptyObject } from '../../api/util'
 import { HEADER_HEIGHT } from '../../api/mock'
 import style from '../../assets/style/global-style'
+import { changeEnterLoading, getAlbumList } from './store/action'
 
 function Album (props) {
+  const id = props.match.params.id;
+
+  const { currentAlbum: currentAlbumImmutable, enterLoading } = props;
+  const { getAlbumDataDispatch } = props;
+
   const [ showStatus, setShowStatus ] = useState(true)
   const [ title, setTitle ] = useState("歌单");
   const [ isMarquee, setIsMarquee ] = useState(false)
 
   const headerEl = useRef();
   
-  const currentAlbum = {
-    creator: {
-      avatarUrl: "http://p1.music.126.net/O9zV6jeawR43pfiK2JaVSw==/109951164232128905.jpg",
-      nickname: "浪里推舟"
-    },
-    coverImgUrl: "http://p2.music.126.net/ecpXnH13-0QWpWQmqlR0gw==/109951164354856816.jpg",
-    subscribedCount: 2010711,
-    name: "听完就睡，耳机是天黑以后柔软的梦境",
-    tracks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(() => {
-      return {
-        name: "我真的受伤了",
-        ar: [{name: "张学友"}, {name: "周华健"}],
-        al: {
-          name: "学友 热"
-        }
-      }
-    })
-  }
+  let currentAlbum = currentAlbumImmutable.toJS()
+
+  useEffect (() => {
+    getAlbumDataDispatch (id);
+  }, [getAlbumDataDispatch, id]);
   
   const handleScroll = useCallback((pos) => {
     let minScrollY = -HEADER_HEIGHT;
@@ -138,16 +133,38 @@ function Album (props) {
     >
       <Container>
         <Header ref={headerEl} title={title} handleClick={handleBack} isMarquee={isMarquee}></Header>
-        <Scroll bounceTop={false} onScroll={handleScroll}>
-          <div>
-            { renderTopDesc() }
-            { renderMenu() }
-            { renderSongList() }
-          </div>
-        </Scroll>
+        {
+          !isEmptyObject(currentAlbum)
+          ? (
+            <Scroll bounceTop={false} onScroll={handleScroll}>
+              <div>
+                { renderTopDesc() }
+                { renderMenu() }
+                { renderSongList() }
+              </div>
+            </Scroll>
+          )
+          : null
+        }
+        { enterLoading ? <Loading></Loading> : null }
       </Container>
     </CSSTransition>
   )
 }
 
-export default React.memo(Album);
+// 映射 Redux 全局的 state 到组件的 props 上
+const mapStateToProps = (state) => ({
+  currentAlbum: state.getIn(['album', 'currentAlbum']),
+  enterLoading: state.getIn(['album', 'enterLoading']),
+});
+// 映射 dispatch 到 props 上
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getAlbumDataDispatch(id) {
+      dispatch(changeEnterLoading(true));
+      dispatch(getAlbumList(id));
+    },
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(Album));

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { renderRoutes } from 'react-router-config'
 import { getRankList } from './store/action'
 import Loading from '../../baseUI/Loading'
 import Scroll from '../../baseUI/Scroll'
@@ -10,7 +11,7 @@ import {
   SongList,
   Container
 } from './style';
-import { filterIndex, filterIdx } from '../../api/util'
+import { filterIndex } from '../../api/util'
 
 function Rank (props) {
   const { rankList, loading } = props
@@ -28,12 +29,8 @@ function Rank (props) {
   let officialList = rankListJS.slice(0, globalStartIndex)
   let globalList = rankListJS.slice(globalStartIndex)
 
-  const enterDetail = (name) => {
-    const idx = filterIdx(name);
-    if(idx === null) {
-      alert("暂无相关数据");
-      return;
-    } 
+  const enterDetail = (detail) => {
+    props.history.push(`/rank/${detail.id}`)
   }
 
   const renderSongList = (list) => {
@@ -54,7 +51,7 @@ function Rank (props) {
        {
         list.map((item) => {
           return (
-            <ListItem key={item.id} tracks={item.tracks} onClick={() => enterDetail(item.name)}>
+            <ListItem key={item.id} tracks={item.tracks} onClick={() => enterDetail(item)}>
               <div className="img_wrapper">
                 <img src={item.coverImgUrl} alt=""/>
                 <div className="decorate"></div>
@@ -81,6 +78,7 @@ function Rank (props) {
           { loading ? <EnterLoading><Loading></Loading></EnterLoading> : null }
         </div>
       </Scroll>
+      { renderRoutes(props.route.routes) }
     </Container>
   )
 }
