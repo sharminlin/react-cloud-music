@@ -10,4 +10,6 @@ export const getSingerListRequest = (category, alpha, count) => axiosInstance.ge
 
 export const getRankListRequest = () => axiosInstance.get(`/toplist/detail`)
 
-export const getAlbumDetailRequest = id => axiosInstance.get (`/playlist/detail?id=${id}`)
+export const getAlbumDetailRequest = id => axiosInstance.get(`/playlist/detail?id=${id}`)
+
+export const getSingerInfoRequest = id => axiosInstance.get(`/artists?id=${id}`)

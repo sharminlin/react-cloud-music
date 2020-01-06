@@ -1,28 +1,22 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
+import { connect } from 'react-redux'
 import { CSSTransition } from "react-transition-group";
 import { Container, ImgWrapper, CollectButton, SongListWrapper, BgLayer } from "./style";
 import Header from '../../baseUI/Header'
 import Scroll from '../../baseUI/Scroll'
-import SongsList from "../SongsList"
+import Loading from '../../baseUI/Loading'
+import SongsList from '../SongsList'
 import { HEADER_HEIGHT } from '../../api/mock'
+import { getSingerInfo, changeEnterLoading } from './store/action'
 
 function Singer (props) {
+  const { artist: immutableArtist, songs: immutableSongs, loading } = props;
+
+  const { getSingerDataDispatch } = props;
   const [ showStatus, setShowStatus ] = useState(true)
 
-  const artist = {
-    picUrl: "https://p2.music.126.net/W__FCWFiyq0JdPtuLJoZVQ==/109951163765026271.jpg",
-    name: "薛之谦",
-    hotSongs: [1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29].map(i => {
-      return {
-        id: i,
-        name: "我好像在哪见过你",
-        ar: [{name: "薛之谦"}],
-        al: {
-          name: "薛之谦专辑"
-        }
-      }
-    })
-  }
+  const artist = immutableArtist.toJS();
+  const songs = immutableSongs.toJS();
 
   const collectButton = useRef();
   const imageWrapper = useRef();
@@ -37,6 +31,8 @@ function Singer (props) {
   const OFFSET = 5;
 
   useEffect(() => {
+    const id = props.match.params.id;
+    getSingerDataDispatch(id);
     let h = imageWrapper.current.offsetHeight;
     songScrollWrapper.current.style.top = `${h - OFFSET}px`;
     initialHeight.current = h;
@@ -99,26 +95,40 @@ function Singer (props) {
       onExited={() => props.history.goBack()}
     >
       <Container>
-      <Header ref={header} title={"头部"} handleClick={setShowStatusFalse} ></Header>
-      <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
-        <div className="filter"></div>
-      </ImgWrapper>
-      <CollectButton ref={collectButton}>
-        <i className="iconfont">&#xe62d;</i>
-        <span className="text"> 收藏 </span>
-      </CollectButton>
-      <BgLayer ref={layer}></BgLayer>
-      <SongListWrapper ref={songScrollWrapper}>
-        <Scroll ref={songScroll} onScroll={handleScroll}>
-          <SongsList
-            songs={artist.hotSongs}
-            showCollect={false}
-          ></SongsList>
-        </Scroll>
-      </SongListWrapper>
+        <Header ref={header} title={"头部"} handleClick={setShowStatusFalse} ></Header>
+        <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
+          <div className="filter"></div>
+        </ImgWrapper>
+        <CollectButton ref={collectButton}>
+          <i className="iconfont">&#xe62d;</i>
+          <span className="text"> 收藏 </span>
+        </CollectButton>
+        <BgLayer ref={layer}></BgLayer>
+        <SongListWrapper ref={songScrollWrapper}>
+          <Scroll ref={songScroll} onScroll={handleScroll}>
+            <SongsList
+              songs={songs}
+              showCollect={false}
+            ></SongsList>
+          </Scroll>
+        </SongListWrapper>
+        { loading ? (<Loading></Loading>) : null}
       </Container>
     </CSSTransition>
   )
 }
 
-export default React.memo(Singer)
+const mapStateToProps = (state) => ({
+  artist: state.getIn(["singerInfo", "artist"]),
+  songs: state.getIn(["singerInfo", "songsOfArtist"]),
+  loading: state.getIn(["singerInfo", "loading"]),
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  getSingerDataDispatch(id) {
+    dispatch(changeEnterLoading(true));
+    dispatch(getSingerInfo(id));
+  }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(Singer))
