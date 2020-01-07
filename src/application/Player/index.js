@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import {
   changePlayingState,
@@ -11,51 +11,151 @@ import {
 } from "./store/action";
 import MiniPlayer from './miniPlayer'
 import NormalPlayer from './normalPlayer'
-import { getSongUrl, isEmptyObject } from '../../api/util'
+import Toast from "../../baseUI/Toast/index"
+import { getSongUrl, isEmptyObject, findIndex, shuffle } from '../../api/util'
+import { playMode } from '../../api/mock'
 
 function Player (props) {
-  const { fullScreen, playList: immutablePlayList, playing, currentIndex, currentSong: immutableCurrentSong } = props;
-  const { toggleFullScreenDispatch, togglePlayingDispatch, changeCurrentIndexDispatch, changeCurrentDispatch } = props;
+  const { 
+    fullScreen, 
+    playList: immutablePlayList, 
+    playing, 
+    currentIndex, 
+    currentSong: immutableCurrentSong, 
+    mode,// 播放模式
+    sequencePlayList:immutableSequencePlayList,// 顺序列表 
+  } = props;
 
-  let currentSong = immutableCurrentSong.toJS();
+  const {
+    toggleFullScreenDispatch, 
+    togglePlayingDispatch, 
+    changeCurrentIndexDispatch, 
+    changeCurrentDispatch,
+    changePlayListDispatch,
+    changeModeDispatch
+  } = props;
+
+  const currentSong = immutableCurrentSong.toJS();
   const playList = immutablePlayList.toJS();
+  const sequencePlayList = immutableSequencePlayList.toJS ();
   // 当前时间
   const [currentTime, setCurrentTime] = useState(0);
   // 歌曲总时长
   const [duration, setDuration] = useState(0);
   // 歌曲播放进度
   let percent = isNaN(currentTime /duration) ? 0 : currentTime / duration;
+  // 记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
+  const [preSong, setPreSong] = useState ({});
+
+  const [modeText, setModeText] = useState("");
 
   const audioRef = useRef()
+  const toastRef = useRef()
 
   useEffect (() => {
-    console.log(playList)
     if (
       !playList.length ||
       currentIndex === -1 ||
-      !playList[currentIndex]
+      !playList[currentIndex] ||
+      playList[currentIndex].id === preSong.id 
     )
       return;
-    changeCurrentIndexDispatch(0);//currentIndex 默认为 - 1，临时改成 0
     let current = playList[0];
+    setPreSong(current)
     changeCurrentDispatch(current);// 赋值 currentSong
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
-      audioRef.current.play();
+      audioRef.current.play()
     });
     togglePlayingDispatch(true);// 播放状态
     setCurrentTime(0);// 从头开始播放
     setDuration((current.dt/ 1000) | 0);// 时长
     // eslint-disable-next-line
-  }, []);
+  }, [playList, currentIndex]);
 
   useEffect(() => {
     playing ? audioRef.current.play() : audioRef.current.pause();
   }, [playing]);
 
-  const clickPlaying = (e, state) => {
+  const clickPlaying = useCallback((e, state) => {
     e.stopPropagation();
     togglePlayingDispatch(state);
+  }, [togglePlayingDispatch]);
+
+  const updateTime = e => {
+    setCurrentTime(e.target.currentTime);
+  };
+
+  const onProgressChange = useCallback(curPercent => {
+    const newTime = curPercent * duration;
+    setCurrentTime(newTime);
+    audioRef.current.currentTime = newTime;
+    if (!playing) {
+      togglePlayingDispatch(true);
+    }
+  }, [playing, duration, togglePlayingDispatch])
+
+  // 一首歌循环
+  const handleLoop = () => {
+    audioRef.current.currentTime = 0;
+    changePlayingState(true);
+    audioRef.current.play();
+  };
+
+  const handlePrev = () => {
+    // 播放列表只有一首歌时单曲循环
+    if (playList.length === 1) {
+      handleLoop();
+      return;
+    }
+    let index = currentIndex - 1;
+    if (index < 0) index = playList.length - 1;
+    if (!playing) togglePlayingDispatch(true);
+    changeCurrentIndexDispatch(index);
+  };
+
+  const handleNext = () => {
+    // 播放列表只有一首歌时单曲循环
+    if (playList.length === 1) {
+      handleLoop();
+      return;
+    }
+    let index = currentIndex + 1;
+    if (index === playList.length) index = 0;
+    if (!playing) togglePlayingDispatch(true);
+    changeCurrentIndexDispatch(index);
+  };
+
+  const changeMode = () => {
+    let newMode = (mode + 1) % 3;
+    if (newMode === 0) {
+      // 顺序模式
+      changePlayListDispatch(sequencePlayList);
+      let index = findIndex(currentSong, sequencePlayList);
+      changeCurrentIndexDispatch(index);
+      setModeText("顺序循环");
+    } else if (newMode === 1) {
+      // 单曲循环
+      changePlayListDispatch(sequencePlayList);
+      setModeText("单曲循环");
+    } else if (newMode === 2) {
+      // 随机播放
+      let newList = shuffle(sequencePlayList);
+      let index = findIndex(currentSong, newList);
+      changePlayListDispatch(newList);
+      changeCurrentIndexDispatch(index);
+      setModeText("随机播放");
+    }
+    changeModeDispatch(newMode);
+    toastRef.current.show()
+  };
+
+  const handleEnd = () => {
+    if (mode === playMode.loop) {
+      handleLoop();
+    } else {
+      handleNext();
+    }
   };
 
   return (
@@ -81,10 +181,22 @@ function Player (props) {
             toggleFullScreen={toggleFullScreenDispatch}
             clickPlaying={clickPlaying}
             percent={percent}
+            onProgressChange={onProgressChange}
+            duration={duration} // 总时长
+            currentTime={currentTime}// 播放时间
+            handlePrev={handlePrev}
+            handleNext={handleNext}
+            mode={mode}
+            changeMode={changeMode}
           ></NormalPlayer>
         )
       }
-      <audio ref={audioRef}></audio>
+      <audio
+        ref={audioRef}
+        onTimeUpdate={updateTime}
+        onEnded={handleEnd}
+      ></audio>
+      <Toast text={modeText} ref={toastRef}></Toast>
     </div>
   )
 }

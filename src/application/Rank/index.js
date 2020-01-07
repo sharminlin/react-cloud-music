@@ -14,7 +14,7 @@ import {
 import { filterIndex } from '../../api/util'
 
 function Rank (props) {
-  const { rankList, loading } = props
+  const { rankList, loading, songsCount } = props
   const { getRankListDataDispatch } = props
 
   useEffect(() => {
@@ -68,7 +68,7 @@ function Rank (props) {
 
   const displayStyle = { display: loading ? 'none' : '' }
   return (
-    <Container>
+    <Container play={songsCount}>
       <Scroll>
         <div>
           <h1 className="offical" style={displayStyle}>官方榜</h1>
@@ -85,7 +85,8 @@ function Rank (props) {
 
 const mapStateToProps = (state) => ({
   rankList: state.getIn(['rank', 'rankList']),
-  loading: state.getIn(['rank', 'loading'])
+  loading: state.getIn(['rank', 'loading']),
+  songsCount: state.getIn(['player', 'playList']).size
 })
 
 const mapDispatchToProps = (dispatch) => ({

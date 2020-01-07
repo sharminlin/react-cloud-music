@@ -1,11 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition } from 'react-transition-group';
-import { Container, TopDesc, Menu, SongList, SongItem } from './style';
-import Header from './../../baseUI/Header/index';
+import { Container, TopDesc, Menu } from './style';
+import SongsList from '../SongsList';
+import Header from '../../baseUI/Header/index';
 import Scroll from '../../baseUI/Scroll/index';
 import Loading from '../../baseUI/Loading/index';
-import { getCount, getName, isEmptyObject } from '../../api/util'
+import MusicNote from "../../baseUI/MusicNote/index";
+import { isEmptyObject } from '../../api/util'
 import { HEADER_HEIGHT } from '../../api/mock'
 import style from '../../assets/style/global-style'
 import { changeEnterLoading, getAlbumList } from './store/action'
@@ -21,6 +23,7 @@ function Album (props) {
   const [ isMarquee, setIsMarquee ] = useState(false)
 
   const headerEl = useRef();
+  const musicNoteRef = useRef();
   
   let currentAlbum = currentAlbumImmutable.toJS()
 
@@ -49,6 +52,10 @@ function Album (props) {
   const handleBack = useCallback(() => {
     setShowStatus(false)
   }, [])
+
+  const musicAnimation = (x, y) => {
+    musicNoteRef.current.startAnimation({ x, y });
+  };
 
   const renderTopDesc = () => {
     return (
@@ -90,35 +97,13 @@ function Album (props) {
 
   const renderSongList = () => {
     return (
-      <SongList>
-        <div className="first_line">
-          <div className="play_all">
-            <i className="iconfont">&#xe6e3;</i>
-            <span > 播放全部 <span className="sum">(共 {currentAlbum.tracks.length} 首)</span></span>
-          </div>
-          <div className="add_list">
-            <i className="iconfont">&#xe62d;</i>
-            <span > 收藏 ({getCount(currentAlbum.subscribedCount)})</span>
-          </div>
-        </div>
-        <SongItem>
-          {
-            currentAlbum.tracks.map((item, index) => {
-              return (
-                <li key={index}>
-                  <span className="index">{index + 1}</span>
-                  <div className="info">
-                    <span>{item.name}</span>
-                    <span>
-                      { getName(item.ar) } - { item.al.name }
-                    </span>
-                  </div>
-                </li>
-              )
-            })
-          }
-        </SongItem>
-      </SongList>
+      <SongsList
+        songs={currentAlbum.tracks}
+        collectCount={currentAlbum.subscribedCount}
+        showCollect={true}
+        showBackground={true}
+        musicAnimation={musicAnimation}
+      ></SongsList>
     )
   }
 
@@ -147,6 +132,7 @@ function Album (props) {
           : null
         }
         { enterLoading ? <Loading></Loading> : null }
+        <MusicNote ref={musicNoteRef}></MusicNote>
       </Container>
     </CSSTransition>
   )

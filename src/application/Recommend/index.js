@@ -10,7 +10,7 @@ import { Content } from './style'
 import * as actionCreators from './store/action';
 
 function Recommend (props) {
-  const { bannerList, recommendList, enterLoading } = props
+  const { bannerList, recommendList, enterLoading, songsCount } = props
 
   const { getBannerDataDispatch, getRecommendListDataDispatch } = props
 
@@ -28,7 +28,7 @@ function Recommend (props) {
   const recommendListJS = recommendList ? recommendList.toJS() : []
 
   return (
-    <Content>
+    <Content play={songsCount}>
       <Scroll className="list" onScroll={forceCheck}>
         <div>
           <Slider bannerList={bannerListJS}></Slider>
@@ -48,6 +48,7 @@ const mapStateToProps = (state) => ({
   bannerList: state.getIn(['recommend', 'bannerList']),
   recommendList: state.getIn(['recommend', 'recommendList']),
   enterLoading: state.getIn(['recommend', 'enterLoading']),
+  songsCount: state.getIn(['player', 'playList']).size
 });
 
 // 映射 dispatch 到 props 上

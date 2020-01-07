@@ -5,12 +5,13 @@ import { Container, ImgWrapper, CollectButton, SongListWrapper, BgLayer } from "
 import Header from '../../baseUI/Header'
 import Scroll from '../../baseUI/Scroll'
 import Loading from '../../baseUI/Loading'
+import MusicNote from "../../baseUI/MusicNote/index";
 import SongsList from '../SongsList'
 import { HEADER_HEIGHT } from '../../api/mock'
 import { getSingerInfo, changeEnterLoading } from './store/action'
 
 function Singer (props) {
-  const { artist: immutableArtist, songs: immutableSongs, loading } = props;
+  const { artist: immutableArtist, songs: immutableSongs, loading, songsCount } = props;
 
   const { getSingerDataDispatch } = props;
   const [ showStatus, setShowStatus ] = useState(true)
@@ -24,6 +25,7 @@ function Singer (props) {
   const songScroll = useRef();
   const header = useRef();
   const layer = useRef();
+  const musicNoteRef = useRef();
   // 图片初始高度
   const initialHeight = useRef(0);
 
@@ -85,6 +87,10 @@ function Singer (props) {
     setShowStatus(false);
   }, []);
 
+  const musicAnimation = (x, y) => {
+    musicNoteRef.current.startAnimation({ x, y });
+  };
+
   return (
     <CSSTransition
       in={showStatus}
@@ -94,7 +100,7 @@ function Singer (props) {
       unmountOnExit
       onExited={() => props.history.goBack()}
     >
-      <Container>
+      <Container play={songsCount}>
         <Header ref={header} title={"头部"} handleClick={setShowStatusFalse} ></Header>
         <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
           <div className="filter"></div>
@@ -109,10 +115,12 @@ function Singer (props) {
             <SongsList
               songs={songs}
               showCollect={false}
+              musicAnimation={musicAnimation}
             ></SongsList>
           </Scroll>
         </SongListWrapper>
         { loading ? (<Loading></Loading>) : null}
+        <MusicNote ref={musicNoteRef}></MusicNote>
       </Container>
     </CSSTransition>
   )
@@ -122,6 +130,7 @@ const mapStateToProps = (state) => ({
   artist: state.getIn(["singerInfo", "artist"]),
   songs: state.getIn(["singerInfo", "songsOfArtist"]),
   loading: state.getIn(["singerInfo", "loading"]),
+  songsCount: state.getIn(['player', 'playList']).size
 })
 
 const mapDispatchToProps = (dispatch) => ({

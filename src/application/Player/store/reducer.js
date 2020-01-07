@@ -6,12 +6,7 @@ const defaultState = fromJS({
   fullScreen: false,//播放器是否为全屏模式
   playing: false, //当前歌曲是否播放
   sequencePlayList: [], //顺序列表(因为之后会有随机模式，列表会乱序，因从拿这个保存顺序列表)
-  playList: [{
-    al: { picUrl: "https://p1.music.126.net/JL_id1CFwNJpzgrXwemh4Q==/109951164172892390.jpg" },
-    name: "木偶人",
-    ar: [{name: "薛之谦"}],
-    id: 1336856777
-  }],
+  playList: [],
   mode: playMode.sequence,//播放模式
   currentIndex: 0,//当前歌曲在播放列表的索引位置
   showPlayList: false,//是否展示播放列表

@@ -113,3 +113,11 @@ export const findIndex = (song, list) => {
     return song.id === item.id;
   });
 };
+
+//转换歌曲播放时间
+export const formatPlayTime = interval => {
+  interval = interval | 0;
+  const minute = (interval / 60) | 0;
+  const second = (interval % 60).toString().padStart(2, "0");
+  return `${minute}:${second}`;
+};

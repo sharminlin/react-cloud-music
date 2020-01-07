@@ -25,7 +25,7 @@ function Singer (props) {
   const { data, dispatch } = useContext(CategoryDataContext)
   const { category, alpha } = data.toJS()
 
-  const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props
+  const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount, songsCount } = props
   const { getHotSingerDispatch, updateDispatch, pullUpRefreshDispatch, pullDownRefreshDispatch } = props
 
   useEffect(() => {
@@ -88,7 +88,7 @@ function Singer (props) {
         <Horizen list={categoryTypes} title="分类 (默认热门):" oldVal={category} handleClick={handleChangeCategory}></Horizen>
         <Horizen list={alphaTypes} title="首字母:" oldVal={alpha} handleClick={handleChangeAlpha}></Horizen>
       </NavContainer>
-      <ListContainer>
+      <ListContainer play={songsCount}>
         <Scroll
           pullUp={ handlePullUp }
           pullDown={ handlePullDown }
@@ -110,7 +110,8 @@ const mapStateToProps = (state) => ({
   pageCount: state.getIn(['singers', 'pageCount']),
   enterLoading: state.getIn(['singers', 'enterLoading']),
   pullUpLoading: state.getIn(['singers', 'pullUpLoading']),
-  pullDownLoading: state.getIn(['singers', 'pullDownLoading'])
+  pullDownLoading: state.getIn(['singers', 'pullDownLoading']),
+  songsCount: state.getIn(['player', 'playList']).size
 })
 
 const mapDispatchToProps = (dispatch) => ({
