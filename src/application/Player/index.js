@@ -11,6 +11,7 @@ import {
 } from "./store/action";
 import MiniPlayer from './miniPlayer'
 import NormalPlayer from './normalPlayer'
+import PlayList from './PlayList';
 import Toast from "../../baseUI/Toast/index"
 import { getSongUrl, isEmptyObject, findIndex, shuffle } from '../../api/util'
 import { playMode } from '../../api/mock'
@@ -32,7 +33,8 @@ function Player (props) {
     changeCurrentIndexDispatch, 
     changeCurrentDispatch,
     changePlayListDispatch,
-    changeModeDispatch
+    changeModeDispatch,
+    togglePlayListDispatch
   } = props;
 
   const currentSong = immutableCurrentSong.toJS();
@@ -46,8 +48,8 @@ function Player (props) {
   let percent = isNaN(currentTime /duration) ? 0 : currentTime / duration;
   // 记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
   const [preSong, setPreSong] = useState ({});
-
-  const [modeText, setModeText] = useState("");
+  const [modeText, setModeText] = useState('');
+  const [songReady, setSongReady] = useState(true);
 
   const audioRef = useRef()
   const toastRef = useRef()
@@ -57,19 +59,23 @@ function Player (props) {
       !playList.length ||
       currentIndex === -1 ||
       !playList[currentIndex] ||
-      playList[currentIndex].id === preSong.id 
+      playList[currentIndex].id === preSong.id ||
+      !songReady
     )
       return;
-    let current = playList[0];
+    let current = playList[currentIndex];
     setPreSong(current)
-    changeCurrentDispatch(current);// 赋值 currentSong
+    setSongReady(false); // 把标志位置为 false, 表示现在新的资源没有缓冲完成，不能切歌
+    changeCurrentDispatch(current); // 赋值 currentSong
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
-      audioRef.current.play()
+      audioRef.current.play().then(() => {
+        setSongReady(true);
+      })
     });
-    togglePlayingDispatch(true);// 播放状态
-    setCurrentTime(0);// 从头开始播放
-    setDuration((current.dt/ 1000) | 0);// 时长
+    togglePlayingDispatch(true); // 播放状态
+    setCurrentTime(0); // 从头开始播放
+    setDuration((current.dt/ 1000) | 0); // 时长
     // eslint-disable-next-line
   }, [playList, currentIndex]);
 
@@ -126,6 +132,11 @@ function Player (props) {
     changeCurrentIndexDispatch(index);
   };
 
+  const handleError = () => {
+    songReady.current = true;
+    alert("播放出错");
+  };
+
   const changeMode = () => {
     let newMode = (mode + 1) % 3;
     if (newMode === 0) {
@@ -169,6 +180,7 @@ function Player (props) {
             toggleFullScreen={toggleFullScreenDispatch}
             clickPlaying={clickPlaying}
             percent={percent}
+            togglePlayList={togglePlayListDispatch}
           ></MiniPlayer>
         )
       }
@@ -188,6 +200,7 @@ function Player (props) {
             handleNext={handleNext}
             mode={mode}
             changeMode={changeMode}
+            togglePlayList={togglePlayListDispatch}
           ></NormalPlayer>
         )
       }
@@ -195,7 +208,9 @@ function Player (props) {
         ref={audioRef}
         onTimeUpdate={updateTime}
         onEnded={handleEnd}
+        onError={handleError}
       ></audio>
+      <PlayList></PlayList>
       <Toast text={modeText} ref={toastRef}></Toast>
     </div>
   )
