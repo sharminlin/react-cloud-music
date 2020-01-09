@@ -51,9 +51,9 @@ function Player (props) {
   // 记录当前的歌曲，以便于下次重渲染时比对是否是一首歌
   const [preSong, setPreSong] = useState ({});
   const [modeText, setModeText] = useState('');
-  const [songReady, setSongReady] = useState(true);
   const [currentPlayingLyric, setPlayingLyric] = useState('');
-
+  
+  const songReady = useRef(true);
   const audioRef = useRef()
   const toastRef = useRef()
   const currentLyric = useRef()
@@ -65,17 +65,17 @@ function Player (props) {
       currentIndex === -1 ||
       !playList[currentIndex] ||
       playList[currentIndex].id === preSong.id ||
-      !songReady
+      !songReady.current
     )
       return;
     let current = playList[currentIndex];
     setPreSong(current)
-    setSongReady(false); // 把标志位置为 false, 表示现在新的资源没有缓冲完成，不能切歌
+    songReady.current = false // 把标志位置为 false, 表示现在新的资源没有缓冲完成，不能切歌
     changeCurrentDispatch(current); // 赋值 currentSong
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
       audioRef.current.play().then(() => {
-        setSongReady(true);
+        songReady.current = true
       })
     });
     getLyric(current.id); // 歌词获取

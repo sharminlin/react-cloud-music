@@ -1,11 +1,22 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { Redirect } from 'react-router-dom'
+
 import Home from '../application/Home'
-import Recommend from '../application/Recommend'
-import Singers from '../application/Singers'
-import Singer from '../application/Singer'
-import Rank from '../application/Rank'
-import Album from '../application/Album'
+
+const SuspenseComponent = Component => props => {
+  return (
+    <Suspense fallback={null}>
+      <Component {...props}></Component>
+    </Suspense>
+  )
+}
+
+const Recommend = SuspenseComponent(lazy(() => import("../application/Recommend/")));
+const Singers = SuspenseComponent(lazy(() => import("../application/Singers/")));
+const Rank = SuspenseComponent(lazy(() => import("../application/Rank/")));
+const Album = SuspenseComponent(lazy(() => import("../application/Album/")));
+const Singer = SuspenseComponent(lazy(() => import("./../application/Singer/")));
+const Search = SuspenseComponent(lazy(() => import("./../application/Search/")));
 
 export default [
   {
@@ -50,7 +61,19 @@ export default [
             component: Album
           }
         ]
-      }
+      },
+      {
+        path: '/search',
+        exact: true,
+        key: "search",
+        component: Search
+      },
+      {
+        path: "/album/:id",
+        exact: true,
+        key: "album",
+        component: Album
+      },
     ]
   }
 ]
