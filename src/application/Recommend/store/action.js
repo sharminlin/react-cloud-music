@@ -17,6 +17,27 @@ export const changeEnterLoading = (data) => ({
   data: data
 })
 
+// export const getBannerList = () => {
+//   return (dispatch) => {
+//     getBannerRequest().then(data => {
+//       dispatch(changeBannerList(data.banners));
+//     }).catch(() => {
+//       console.log("轮播图数据传输错误");
+//     }) 
+//   }
+// };
+
+// export const getRecommendList = () => {
+//   return (dispatch) => {
+//     getRecommendListRequest().then(data => {
+//       dispatch(changeRecommendList(data.result));
+//       dispatch(changeEnterLoading(false));
+//     }).catch (() => {
+//       console.log ("推荐歌单数据传输错误");
+//     });
+//   }
+// };
+
 export const getBannerList = () => ({
   type: actionTypes.GET_BANNER_LIST
 })
