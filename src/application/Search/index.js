@@ -17,14 +17,11 @@ function Search (props) {
   const {
     hotList, 
     enterLoading, 
-    suggestList: immutableSuggestList, 
+    suggestList, 
     songsCount, 
-    songsList: immutableSongsList
+    songsList
   } = props;
-  
-  const suggestList = immutableSuggestList.toJS();
-  const songsList = immutableSongsList.toJS();
-  
+
   const {
     getHotKeyWordsDispatch,
     changeEnterLoadingDispatch,
@@ -50,7 +47,7 @@ function Search (props) {
 
   useEffect (() => {
     setShow(true);
-    if (!hotList.size) getHotKeyWordsDispatch();
+    if (!hotList.length) getHotKeyWordsDispatch();
     // eslint-disable-next-line
   }, []);
 
@@ -60,7 +57,7 @@ function Search (props) {
   }
 
   const renderHotKey = () => {
-    let list = hotList ? hotList.toJS (): [];
+    let list = hotList || [];
     return (
       <ul>
         {
@@ -183,11 +180,11 @@ function Search (props) {
 
 // 映射Redux全局的state到组件的props上
 const mapStateToProps = (state) => ({
-  hotList: state.getIn(['search', 'hotList']),
-  enterLoading: state.getIn(['search', 'enterLoading']),
-  suggestList: state.getIn(['search', 'suggestList']),
-  songsCount: state.getIn(['player', 'playList']).size,
-  songsList: state.getIn(['search', 'songsList'])
+  hotList: state.search.hotList,
+  enterLoading: state.search.enterLoading,
+  suggestList: state.search.suggestList,
+  songsCount: state.player.playList.length,
+  songsList: state.search.songsList
 });
 
 // 映射dispatch到props上

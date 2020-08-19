@@ -19,11 +19,11 @@ function PlayList(props) {
 
   const {
     currentIndex,
-    currentSong:immutableCurrentSong,
+    currentSong,
     showPlayList,
-    playList:immutablePlayList,
+    playList,
     mode,
-    sequencePlayList:immutableSequencePlayList
+    sequencePlayList
   } = props;
   const {
     togglePlayListDispatch,
@@ -33,10 +33,6 @@ function PlayList(props) {
     deleteSongDispatch,
     clearDispatch 
   } = props;
-  
-  const currentSong = immutableCurrentSong.toJS();
-  const playList = immutablePlayList.toJS();
-  const sequencePlayList = immutableSequencePlayList.toJS();
 
   const listContentRef = useRef();
   const confirmRef = useRef();
@@ -239,12 +235,12 @@ function PlayList(props) {
 }
 // 映射Redux全局的state到组件的props上
 const mapStateToProps = (state) => ({
-  currentIndex: state.getIn(['player', 'currentIndex']),
-  currentSong: state.getIn(['player', 'currentSong']),
-  playList: state.getIn(['player', 'playList']),//播放列表
-  sequencePlayList: state.getIn(['player', 'sequencePlayList']),//顺序排列时的播放列表
-  showPlayList: state.getIn(['player', 'showPlayList']),
-  mode: state.getIn(['player', 'mode'])
+  currentSong: state.player.currentSong,
+  showPlayList: state.player.showPlayList,
+  mode: state.player.mode,
+  currentIndex: state.player.currentIndex,
+  playList: state.player.playList,
+  sequencePlayList: state.player.sequencePlayList
 });
 // 映射dispatch到props上
 const mapDispatchToProps = (dispatch) => {

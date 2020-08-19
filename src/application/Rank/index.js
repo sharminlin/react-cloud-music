@@ -18,16 +18,15 @@ function Rank (props) {
   const { getRankListDataDispatch } = props
 
   useEffect(() => {
-    if (!rankList.size) {
+    if (!rankList.length) {
       getRankListDataDispatch()
     }
     // eslint-disable-next-line
   }, [])
 
-  let rankListJS = rankList.toJS()
-  let globalStartIndex = filterIndex(rankListJS)
-  let officialList = rankListJS.slice(0, globalStartIndex)
-  let globalList = rankListJS.slice(globalStartIndex)
+  let globalStartIndex = filterIndex(rankList)
+  let officialList = rankList.slice(0, globalStartIndex)
+  let globalList = rankList.slice(globalStartIndex)
 
   const enterDetail = (detail) => {
     props.history.push(`/rank/${detail.id}`)
@@ -84,9 +83,9 @@ function Rank (props) {
 }
 
 const mapStateToProps = (state) => ({
-  rankList: state.getIn(['rank', 'rankList']),
-  loading: state.getIn(['rank', 'loading']),
-  songsCount: state.getIn(['player', 'playList']).size
+  rankList: state.rank.rankList,
+  loading: state.rank.loading,
+  songsCount: state.player.playList.length
 })
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,18 +1,20 @@
 import * as actionTypes from './constants';
-import { fromJS } from 'immutable';
+import produce from 'immer';
 
-const defaultState = fromJS({
+const defaultState = {
   currentAlbum: {},
   enterLoading: false,
-})
+}
 
-export default (state = defaultState, action) => {
+export default produce((draft, action) => {
   switch (action.type) {
     case actionTypes.CHANGE_CURRENT_ALBUM:
-      return state.set('currentAlbum', action.data);
+      draft.currentAlbum = action.data;
+      break;
     case actionTypes.CHANGE_ENTER_LOADING:
-      return state.set('enterLoading', action.data);
+      draft.enterLoading = action.data;
+      break;
     default:
-      return state;
+      break;
   }
-};
+}, defaultState);

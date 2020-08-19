@@ -21,12 +21,12 @@ import Lyric from './../../api/lyricParser';
 function Player (props) {
   const { 
     fullScreen, 
-    playList: immutablePlayList, 
+    playList, 
     playing, 
     currentIndex, 
-    currentSong: immutableCurrentSong, 
+    currentSong, 
     mode,// 播放模式
-    sequencePlayList:immutableSequencePlayList,// 顺序列表 
+    sequencePlayList,// 顺序列表 
   } = props;
 
   const {
@@ -39,9 +39,6 @@ function Player (props) {
     togglePlayListDispatch
   } = props;
 
-  const currentSong = immutableCurrentSong.toJS();
-  const playList = immutablePlayList.toJS();
-  const sequencePlayList = immutableSequencePlayList.toJS ();
   // 当前时间
   const [currentTime, setCurrentTime] = useState(0);
   // 歌曲总时长
@@ -259,14 +256,14 @@ function Player (props) {
 
 // 映射 Redux 全局的 state 到组件的 props 上
 const mapStateToProps = state => ({
-  fullScreen: state.getIn(["player", "fullScreen"]),
-  playing: state.getIn(["player", "playing"]),
-  currentSong: state.getIn(["player", "currentSong"]),
-  showPlayList: state.getIn(["player", "showPlayList"]),
-  mode: state.getIn(["player", "mode"]),
-  currentIndex: state.getIn(["player", "currentIndex"]),
-  playList: state.getIn(["player", "playList"]),
-  sequencePlayList: state.getIn(["player", "sequencePlayList"])
+  fullScreen: state.player.fullScreen,
+  playing: state.player.playing,
+  currentSong: state.player.currentSong,
+  showPlayList: state.player.showPlayList,
+  mode: state.player.mode,
+  currentIndex: state.player.currentIndex,
+  playList: state.player.playList,
+  sequencePlayList: state.player.sequencePlayList
 });
 
 // 映射 dispatch 到 props 上

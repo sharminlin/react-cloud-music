@@ -15,7 +15,7 @@ import { changeEnterLoading, getAlbumList } from './store/action'
 function Album (props) {
   const id = props.match.params.id;
 
-  const { currentAlbum: currentAlbumImmutable, enterLoading } = props;
+  const { currentAlbum, enterLoading } = props;
   const { getAlbumDataDispatch } = props;
 
   const [ showStatus, setShowStatus ] = useState(true)
@@ -24,8 +24,6 @@ function Album (props) {
 
   const headerEl = useRef();
   const musicNoteRef = useRef();
-  
-  let currentAlbum = currentAlbumImmutable.toJS()
 
   useEffect (() => {
     getAlbumDataDispatch (id);
@@ -140,8 +138,8 @@ function Album (props) {
 
 // 映射 Redux 全局的 state 到组件的 props 上
 const mapStateToProps = (state) => ({
-  currentAlbum: state.getIn(['album', 'currentAlbum']),
-  enterLoading: state.getIn(['album', 'enterLoading']),
+  currentAlbum: state.album.currentAlbum,
+  enterLoading: state.album.enterLoading,
 });
 // 映射 dispatch 到 props 上
 const mapDispatchToProps = (dispatch) => {

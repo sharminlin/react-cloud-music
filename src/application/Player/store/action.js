@@ -10,12 +10,11 @@ import {
   DELETE_SONG,
   INSERT_SONG
 } from './constants';
-import { fromJS } from 'immutable';
 import { getSongDetailRequest } from '../../../api/request'
 
 export const changeCurrentSong = (data) => ({
   type: SET_CURRENT_SONG,
-  data: fromJS(data)
+  data: data
 });
 
 export const changeFullScreen =  (data) => ({
@@ -30,12 +29,12 @@ export const changePlayingState = (data) => ({
 
 export const changeSequecePlayList = (data) => ({
   type: SET_SEQUECE_PLAYLIST,
-  data: fromJS(data)
+  data: data
 });
 
 export const changePlayList  = (data) => ({
   type: SET_PLAYLIST,
-  data: fromJS(data)
+  data: data
 });
 
 export const changePlayMode = (data) => ({

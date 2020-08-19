@@ -1,10 +1,9 @@
 import { getRankListRequest } from '../../../api/request'
 import { CHANGE_RANKLIST, CHANGE_LOADING } from './constants'
-import { fromJS } from 'immutable'
 
 export const changeRankList = (data) => ({
   type: CHANGE_RANKLIST,
-  data: fromJS(data)
+  data
 })
 
 export const changeLoading = (data) => ({

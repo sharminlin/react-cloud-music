@@ -1,20 +1,22 @@
-import { fromJS } from 'immutable'
 import * as actionTypes from './constants'
+import produce from 'immer'
 
-const defaultState = fromJS({
+const defaultState = {
   rankList: [],
   loading: true
-})
+}
 
-const reducer =  (state = defaultState, action) => {
+const reducer = produce((draft, action) => {
   switch(action.type) {
     case actionTypes.CHANGE_RANKLIST: 
-      return state.set('rankList', action.data)
+      draft.rankList = action.data
+      break
     case actionTypes.CHANGE_LOADING: 
-      return state.set('loading', action.data)
+      draft.loading = action.data
+      break
     default:
-      return state
+      break
   }
-}
+}, defaultState)
 
 export default reducer

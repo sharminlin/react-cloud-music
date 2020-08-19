@@ -1,13 +1,13 @@
 import * as actionTypes from './constants';
-import { fromJS } from 'immutable';
+import produce from 'immer'
 import { playMode } from './../../../api/mock';
 import { findIndex } from '../../../api/util'; // 注意引入工具方法
 
 const handleDeleteSong = (state, song) => {
   //也可用loadsh库的deepClone方法。这里深拷贝是基于纯函数的考虑，不对参数state做修改
-  const playList = JSON.parse(JSON.stringify(state.get('playList').toJS()));
-  const sequenceList = JSON.parse(JSON.stringify(state.get('sequencePlayList').toJS()));
-  let currentIndex = state.get('currentIndex');
+  const playList = JSON.parse(JSON.stringify(state.playList));
+  const sequenceList = JSON.parse(JSON.stringify(state.sequencePlayList));
+  let currentIndex = state.currentIndex;
   // 找对应歌曲在播放列表中的索引
   const fpIndex = findIndex(song, playList);
   // 在播放列表中将其删除
@@ -19,17 +19,17 @@ const handleDeleteSong = (state, song) => {
   const fsIndex = findIndex(song, sequenceList);
   sequenceList.splice(fsIndex, 1);
 
-  return state.merge({
-    'playList': fromJS(playList),
-    'sequencePlayList': fromJS(sequenceList),
-    'currentIndex': fromJS(currentIndex)
-  });
+  return Object.assign(state, {
+    'playList': playList,
+    'sequencePlayList': sequenceList,
+    'currentIndex': currentIndex,
+  })
 }
 
 const handleInsertSong = (state, song) => {
-  const playList = JSON.parse(JSON.stringify(state.get('playList').toJS()));
-  const sequenceList = JSON.parse(JSON.stringify(state.get('sequencePlayList').toJS()));
-  let currentIndex = state.get('currentIndex');
+  const playList = JSON.parse(JSON.stringify(state.playList));
+  const sequenceList = JSON.parse(JSON.stringify(state.sequencePlayList));
+  let currentIndex = state.currentIndex;
   //看看有没有同款
   console.log(song)
   let fpIndex = findIndex(song, playList);
@@ -63,14 +63,14 @@ const handleInsertSong = (state, song) => {
       sequenceList.splice(fsIndex + 1, 1);
     }
   }
-  return state.merge({
-    'playList': fromJS(playList),
-    'sequencePlayList': fromJS(sequenceList),
-    'currentIndex': fromJS(currentIndex),
-  });
+  return Object.assign(state, {
+    'playList': playList,
+    'sequencePlayList': sequenceList,
+    'currentIndex': currentIndex,
+  })
 }
 
-const defaultState = fromJS({
+const defaultState = {
   fullScreen: false,//播放器是否为全屏模式
   playing: false, //当前歌曲是否播放
   sequencePlayList: [], //顺序列表(因为之后会有随机模式，列表会乱序，因从拿这个保存顺序列表)
@@ -79,31 +79,41 @@ const defaultState = fromJS({
   currentIndex: 0,//当前歌曲在播放列表的索引位置
   showPlayList: false,//是否展示播放列表
   currentSong: {}
-});
+};
 
-export default (state = defaultState, action) => {
+export default produce((draft, action) => {
   switch(action.type) {
     case actionTypes.SET_CURRENT_SONG:
-      return state.set('currentSong', action.data);
+      draft.currentSong = action.data
+      break
     case actionTypes.SET_FULL_SCREEN:
-      return state.set('fullScreen', action.data);
+      draft.fullScreen = action.data
+      break
     case actionTypes.SET_PLAYING_STATE:
-      return state.set('playing', action.data);
+      draft.playing = action.data
+      break
     case actionTypes.SET_SEQUECE_PLAYLIST:
-      return state.set('sequencePlayList', action.data);
+      draft.sequencePlayList = action.data
+      break
     case actionTypes.SET_PLAYLIST:
-      return state.set('playList', action.data);
+      draft.playList = action.data
+      break
     case actionTypes.SET_PLAY_MODE:
-      return state.set('mode', action.data);
+      draft.mode = action.data
+      break
     case actionTypes.SET_CURRENT_INDEX:
-      return state.set('currentIndex', action.data);
+      draft.currentIndex = action.data
+      break
     case actionTypes.SET_SHOW_PLAYLIST:
-      return state.set('showPlayList', action.data);
+      draft.showPlayList = action.data
+      break
     case actionTypes.DELETE_SONG:
-      return handleDeleteSong(state, action.data);
+      handleDeleteSong(draft, action.data);
+      break
     case actionTypes.INSERT_SONG:
-      return handleInsertSong(state, action.data);
+      handleInsertSong(draft, action.data);
+      break
     default:
-      return state;
+      break
   }
-}
+}, defaultState)
