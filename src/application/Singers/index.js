@@ -20,10 +20,7 @@ import {
 import { CHANGE_CATEGORY, CHANGE_ALPHA, CategoryDataContext } from './data'
 
 function Singer (props) {
-  // let [ category, setCategory ] = useState('')
-  // let [ alpha, setAlpha ] = useState('')
-  const { data, dispatch } = useContext(CategoryDataContext)
-  const { category, alpha } = data.toJS()
+  const { data: { category, alpha }, dispatch } = useContext(CategoryDataContext)
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount, songsCount } = props
   const { getHotSingerDispatch, updateDispatch, pullUpRefreshDispatch, pullDownRefreshDispatch } = props
@@ -36,13 +33,11 @@ function Singer (props) {
   }, [])
 
   function handleChangeCategory (value) {
-    // setCategory(value)
     dispatch({ type: CHANGE_CATEGORY, data: value })
     updateDispatch(value, alpha)
   }
 
   function handleChangeAlpha (value) {
-    // setAlpha(value)
     dispatch({ type: CHANGE_ALPHA, data: value })
     updateDispatch(category, value)
   }
@@ -61,11 +56,10 @@ function Singer (props) {
 
   // 渲染函数，返回歌手列表
   const renderSingerList = () => {
-    const singerListJS = singerList ? singerList.toJS() : []
     return (
       <List>
         {
-          singerListJS.map((item, index) => {
+          singerList.map((item, index) => {
             return (
               <ListItem key={item.accountId + '-' + index } onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
@@ -106,12 +100,12 @@ function Singer (props) {
 }
 
 const mapStateToProps = (state) => ({
-  singerList: state.getIn(['singers', 'singerList']),
-  pageCount: state.getIn(['singers', 'pageCount']),
-  enterLoading: state.getIn(['singers', 'enterLoading']),
-  pullUpLoading: state.getIn(['singers', 'pullUpLoading']),
-  pullDownLoading: state.getIn(['singers', 'pullDownLoading']),
-  songsCount: state.getIn(['player', 'playList']).size
+  singerList: state.singers.singerList,
+  pageCount: state.singers.pageCount,
+  enterLoading: state.singers.enterLoading,
+  pullUpLoading: state.singers.pullUpLoading,
+  pullDownLoading: state.singers.pullDownLoading,
+  songsCount: state.player.playList.length
 })
 
 const mapDispatchToProps = (dispatch) => ({

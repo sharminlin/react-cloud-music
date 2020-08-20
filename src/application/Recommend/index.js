@@ -40,8 +40,6 @@ function Recommend (props) {
 // 映射 Redux 全局的 state 到组件的 props 上
 const mapStateToProps = (state) => {
   return ({
-    // 不要在这里将数据 toJS
-    // 不然每次 diff 比对 props 的时候都是不一样的引用，还是导致不必要的重渲染，属于滥用 immutable
     bannerList: state.recommend.bannerList,
     recommendList: state.recommend.recommendList,
     enterLoading: state.recommend.recommendList,

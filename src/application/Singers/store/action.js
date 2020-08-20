@@ -1,4 +1,3 @@
-import { fromJS } from 'immutable'
 import {
   CHANGE_SINGER_LIST,
   CHANGE_PAGE_COUNT,
@@ -12,30 +11,15 @@ import {
   getSingerListRequest
 } from "../../../api/request";
 
-export const changeSingerList = (data) => ({
-  type: CHANGE_SINGER_LIST,
-  data: fromJS(data)
-})
+export const changeSingerList = (data) => ({ type: CHANGE_SINGER_LIST, data })
 
-export const changePageCount = (data) => ({
-  type: CHANGE_PAGE_COUNT,
-  data
-})
+export const changePageCount = (data) => ({ type: CHANGE_PAGE_COUNT, data })
 
-export const changePullUpLoading = (data) => ({
-  type: CHANGE_PULLUP_LOADING,
-  data
-})
+export const changePullUpLoading = (data) => ({ type: CHANGE_PULLUP_LOADING, data })
 
-export const changePullDownLoading = (data) => ({
-  type: CHANGE_PULLDOWN_LOADING,
-  data
-})
+export const changePullDownLoading = (data) => ({ type: CHANGE_PULLDOWN_LOADING, data })
 
-export const changeEnterLoading = (data) => ({
-  type: CHANGE_ENTER_LOADING,
-  data
-})
+export const changeEnterLoading = (data) => ({ type: CHANGE_ENTER_LOADING, data })
 
 export const getHotSingerList = () => {
   return dispatch => {
@@ -52,8 +36,8 @@ export const getHotSingerList = () => {
 
 export const refreshMoreHotSingerList = () => {
   return (dispatch, getState) => {
-    const pageCount = getState().getIn(['singers', 'pageCount']);
-    const singerList = getState().getIn(['singers', 'singerList']).toJS();
+    const pageCount = getState().singers.pageCount;
+    const singerList = getState().singers.singerList;
     getHotSingerListRequest(pageCount).then(res => {
       const data = [...singerList, ...res.artists];
       dispatch(changeSingerList(data));
@@ -79,8 +63,8 @@ export const getSingerList = (category, alpha) => {
 
 export const refreshMoreSingerList = (category, alpha) => {
   return (dispatch, getState) => {
-    const pageCount = getState().getIn(['singers', 'pageCount']);
-    const singerList = getState().getIn(['singers', 'singerList']).toJS();
+    const pageCount = getState().singers.pageCount;
+    const singerList = getState().singers.singerList;
     getSingerListRequest(category, alpha, pageCount).then(res => {
       const data = [...singerList, ...res.artists];
       dispatch(changeSingerList(data));

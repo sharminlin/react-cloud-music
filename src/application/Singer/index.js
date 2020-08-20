@@ -11,13 +11,10 @@ import { HEADER_HEIGHT } from '../../api/mock'
 import { getSingerInfo, changeEnterLoading } from './store/action'
 
 function Singer (props) {
-  const { artist: immutableArtist, songs: immutableSongs, loading, songsCount } = props;
+  const { artist, songs, loading, songsCount } = props;
 
   const { getSingerDataDispatch } = props;
   const [ showStatus, setShowStatus ] = useState(true)
-
-  const artist = immutableArtist.toJS();
-  const songs = immutableSongs.toJS();
 
   const collectButton = useRef();
   const imageWrapper = useRef();
@@ -101,7 +98,7 @@ function Singer (props) {
       onExited={() => props.history.goBack()}
     >
       <Container play={songsCount}>
-        <Header ref={header} title={"头部"} handleClick={setShowStatusFalse} ></Header>
+        <Header ref={header} title={artist.name} handleClick={setShowStatusFalse} ></Header>
         <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
           <div className="filter"></div>
         </ImgWrapper>
@@ -119,7 +116,7 @@ function Singer (props) {
             ></SongsList>
           </Scroll>
         </SongListWrapper>
-        { loading ? (<Loading></Loading>) : null}
+        { loading ? (<Loading show={true}></Loading>) : null}
         <MusicNote ref={musicNoteRef}></MusicNote>
       </Container>
     </CSSTransition>
@@ -127,10 +124,10 @@ function Singer (props) {
 }
 
 const mapStateToProps = (state) => ({
-  artist: state.getIn(["singerInfo", "artist"]),
-  songs: state.getIn(["singerInfo", "songsOfArtist"]),
-  loading: state.getIn(["singerInfo", "loading"]),
-  songsCount: state.getIn(['player', 'playList']).size
+  artist: state.singerInfo.artist,
+  songs: state.singerInfo.songsOfArtist,
+  loading: state.singerInfo.loading,
+  songsCount: state.player.playList.length
 })
 
 const mapDispatchToProps = (dispatch) => ({

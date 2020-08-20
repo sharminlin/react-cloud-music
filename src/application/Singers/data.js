@@ -1,27 +1,29 @@
 import React, { createContext, useReducer } from 'react'
-import { fromJS } from 'immutable'
+import produce from 'immer'
 
 export const CHANGE_CATEGORY = 'singers/CHANGE_CATEGORY'
 export const CHANGE_ALPHA = 'singers/CHANGE_ALPHA'
 
 export const CategoryDataContext = createContext({})
 
-const reducer = (state, action) => {
+const reducer = produce((state, action) => {
   switch(action.type) {
-    case CHANGE_CATEGORY: 
-      return state.set('category', action.data)
+    case CHANGE_CATEGORY:
+      state.category = action.data;
+      break;
     case CHANGE_ALPHA:
-      return state.set('alpha', action.data)
-    default: 
-      return state
+      state.alpha = action.data;
+      break;
+    default:
+      break;
   }
-}
+}, {})
 
 const Data = function (props) {
-  const [ data, dispatch ] = useReducer(reducer, fromJS({
+  const [ data, dispatch ] = useReducer(reducer, {
     category: '',
     alpha: ''
-  }))
+  })
 
   return (
     <CategoryDataContext.Provider value={{ data, dispatch }}>
