@@ -5,7 +5,7 @@ import { SliderContainer } from './style'
 
 function Slider (props) {
   const { bannerList } = props
-  const [sliderSwiper, setSliderSwiper] = useState (null)
+  const [sliderSwiper, setSliderSwiper] = useState(null)
 
   useEffect(() => {
     if (bannerList.length && !sliderSwiper){
